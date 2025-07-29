@@ -35,3 +35,6 @@ cd social-media-dashboard
 
 # Run command 
 py manage.py runserver
+
+# Author
+Anshika Agarwal
