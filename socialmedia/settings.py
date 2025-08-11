@@ -107,7 +107,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 
-
+# FIREBASE_CREDENTIALS_PATH = BASE_DIR / 'firebasekey.json'
 
 SOCIALACCOUNT_PROVIDERS = {
     'facebook': {

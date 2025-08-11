@@ -1,11 +1,8 @@
-from .firebase import db
+from django.contrib.auth import authenticate, login
 from .forms import User_Registration_Form,Login_Form,PostForm
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .firebase import db, bucket
-import uuid
 from django.contrib.auth.models import User
-from django.contrib.auth.hashers import make_password
 from .models import Post
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
@@ -14,32 +11,28 @@ from django.urls import reverse
 
 
 
+# login
 
-# ✅ Login View
 def Login(request):
-
     if request.method == 'POST':
         form = Login_Form(request.POST)
         if form.is_valid():
             account = form.cleaned_data['account']
             password = form.cleaned_data['password']
 
-            users_ref = db.reference('users')
-            users = users_ref.get()
-
-            for key, user in users.items():
-                if user['email'] == account and user['password'] == password:
-                    request.session['user_email'] = user['email']
-                    return redirect('socialdashboard')
-
-            form.add_error(None, 'Invalid email or password')
+            # Authenticate user using Django auth
+            user = authenticate(username=account, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('socialdashboard')  # Or your homepage
+            else:
+                form.add_error(None, 'Invalid email or password')
     else:
         form = Login_Form()
 
     return render(request, 'login.html', {'form': form})
 
-# ✅ Register View
-
+#  ✅ Register View
 
 def Register(request):
     if request.method == "POST":
@@ -49,27 +42,20 @@ def Register(request):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
 
-            # ✅ Create Django user
+            # Create Django user
             user = User.objects.create_user(
-                username=email,  # using email as username
+                username=email,      # using email as username
                 email=email,
                 password=password,
-                first_name=name  # saving "name" to first_name
+                first_name=name
             )
 
-            # ✅ Also store user in Firebase (optional)
-            ref = db.reference('users')  # Firebase node
-            ref.push({
-                'name': name,
-                'email': email
-                # Do NOT store raw password ideally
-            })
-
-            return redirect('login-file')
+            return redirect('login-file')  # Redirect to login or dashboard
     else:
         form = User_Registration_Form()
 
     return render(request, 'auth/register.html', {'form': form})
+
 
 
 # ✅ Dashboard View

@@ -1,4 +1,6 @@
-{% load socialaccount %} {% load static tailwind_tags %} {% load static %}
+{% load socialaccount %}
+{% load static tailwind_tags %}
+{% load static %}
 <!DOCTYPE html>
 <html>
   <head>
@@ -13,7 +15,6 @@
     {% tailwind_css %}
   </head>
   <body>
-
     <div
       class="flex flex-col md:flex-row items-center justify-center min-h-screen gap-10 p-4"
     >
@@ -35,43 +36,54 @@
       >
         {% csrf_token %}
 
-        <!-- Show errors -->
-        {% if form.errors %}
-        <div class="mb-4 text-red-600">
-          <ul>
-            {% for field in form %} {% for error in field.errors %}
-            <li>{{ field.label }}: {{ error }}</li>
-            {% endfor %} {% endfor %}
-          </ul>
-        </div>
+        <!-- Non-field errors -->
+        {% if form.non_field_errors %}
+          <div class="mb-4 text-red-600">
+            <ul>
+              {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          </div>
         {% endif %}
 
+        <!-- Email Field -->
         <div class="mb-4">
-          <label for="account" class="block text-sm font-medium text-gray-700">
+          <label for="{{ form.account.id_for_label }}" class="block text-sm font-medium text-gray-700">
             Email
           </label>
           <input
             type="text"
-            name="account"
-            id="account"
+            name="{{ form.account.name }}"
+            id="{{ form.account.id_for_label }}"
+            value="{{ form.account.value|default_if_none:'' }}"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-500"
             required
           />
+          {% if form.account.errors %}
+            <p class="text-red-600 text-sm mt-1">{{ form.account.errors.0 }}</p>
+          {% endif %}
         </div>
 
+        <!-- Password Field -->
         <div class="mb-4">
-          <label for="password" class="block text-sm font-medium text-gray-700">
+          <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-700">
             Password
           </label>
           <input
             type="password"
-            name="password"
-            id="password"
+            name="{{ form.password.name }}"
+            id="{{ form.password.id_for_label }}"
+            value="{{ form.password.value|default_if_none:'' }}"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-500"
             required
           />
+          {% if form.password.errors %}
+            <p class="text-red-600 text-sm mt-1">{{ form.password.errors.0 }}</p>
+          {% endif %}
         </div>
 
+        <!-- Remember Me Checkbox -->
         <div class="mb-4 flex items-center">
           <input
             type="checkbox"
@@ -92,31 +104,24 @@
 
         <h6 class="mt-4">
           Don't have an account?
-          <a href="{% url 'register' %}" class="text-blue-500 underline"
-            >Register here</a
-          >
+          <a href="{% url 'register' %}" class="text-blue-500 underline">
+            Register here
+          </a>
         </h6>
 
-        <div class="mt-4 space-x-2">
-          <button
-            class="bg-blue-500 px-2 py-2 rounded hover:bg-blue-800 text-white"
+        <div class="mt-4 space-x-2 flex justify-center">
+          <a
+            href="{% provider_login_url 'facebook' %}"
+            class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-800 text-white inline-block"
           >
-            <a
-              class="text-white decoration-0"
-              href="{% provider_login_url 'facebook' %}"
-            >
-              Login with Facebook
-            </a>
-          </button>
-          <button
-            class="bg-green-500 rounded px-2 py-2 hover:bg-green-800 text-white"
+            Login with Facebook
+          </a>
+          <a
+            href="{% provider_login_url 'google' %}"
+            class="bg-green-500 px-4 py-2 rounded hover:bg-green-800 text-white inline-block"
           >
-            <a
-              class="text-white decoration-0"
-              href="{% provider_login_url 'google' %}"
-              >Login with Google</a
-            >
-        </button>
+            Login with Google
+          </a>
         </div>
       </form>
     </div>
