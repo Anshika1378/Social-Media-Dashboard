@@ -28,7 +28,7 @@ DEBUG = True
 ACCOUNT_LOGOUT_ON_GET = True
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['social-media-dashboard-x6wc.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
